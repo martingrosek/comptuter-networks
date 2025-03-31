@@ -49,6 +49,14 @@ fun sendHttpRequest(host: String, port: Int, path: String = "/") { //this functi
 
     println("---- HTTP RESPONSE END ----")
 
+    println("---- HTTP RESPONSE BODY START ----")
+    while (true) { //An infinite loop begins that will run until the condition is true
+        val bodyLine = reader.readLine() ?: break //read one line from the reader If the readLine() method returns null (meaning there is no more data), the break command is immediately executed
+        println(bodyLine) //The line read is printed to the console.
+    }
+    println("---- HTTP RESPONSE BODY END ----")
+
+
     //Close all resources to release the connection:
 
 
@@ -57,20 +65,25 @@ fun sendHttpRequest(host: String, port: Int, path: String = "/") { //this functi
     socket.close() //socket: TCP connection
 
     // Če je status 301 ali 302 → sledi preusmeritvi
-    if (statusCode == 301 || statusCode == 302) {
-        println("Redirect detected to: $redirectLocation")
-        redirectLocation?.let {
-            val url = if (it.startsWith("http")) {
-                java.net.URL(it)
+    if (statusCode == 301 || statusCode == 302) { //Checks whether the HTTP response status code is 301 or 302. If it is, the block inside the if is executed.
+        println("Redirect detected to: $redirectLocation") //prints the redirect address (from the Location header) to which the client should redirect.
+        redirectLocation?.let { //If redirectLocation is not null, the let block is executed.
+            val url = if (it.startsWith("http")) { //Creates a URL object that represents the redirect address:
+                java.net.URL(it) //If Location already contains a full address use it directly.
             } else {
-                java.net.URL("http://$host$it")
+                java.net.URL("http://$host$it") //If it only contains a relative path, construct the URL using the current host.
             }
 
             sendHttpRequest(url.host, url.port.takeIf { it != -1 } ?: 80, url.path)
+
+            //Re-sends the HTTP request to the new address:
+            //url.host: the domain of the new server.
+            //url.port: uses the specified port if it exists, otherwise uses the default port 80.
+            //url.path: the path to the new content.
         }
     }
 }
 
 fun main() {
-    sendHttpRequest("127.0.0.1", 80)
+    sendHttpRequest("127.0.0.1", 80,) //main function
 }
