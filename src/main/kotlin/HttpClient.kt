@@ -85,5 +85,7 @@ fun sendHttpRequest(host: String, port: Int, path: String = "/") { //this functi
 }
 
 fun main() {
-    sendHttpRequest("127.0.0.1", 80,) //main function
+    //sendHttpRequest("127.0.0.1", 80, "/projectCN/index.html") //main function
+    sendHttpRequest("127.0.0.1", 80, "/dashboard/")
+
 }
